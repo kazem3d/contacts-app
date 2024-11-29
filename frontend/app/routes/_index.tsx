@@ -101,10 +101,10 @@ export default function PhoneBook() {
     <div className="p-6">
       <div className="flex items-center space-x-2 mb-4">
         <div className="relative flex-1">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute right-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input 
-            placeholder="Search by name or job title" 
-            className="pl-8" 
+            placeholder="جستجوی نام یا عنوان شغلی ..." 
+            className="pr-8" 
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value)
@@ -116,7 +116,7 @@ export default function PhoneBook() {
 
       <div className="mb-4">
         <h2 className="text-xl font-semibold">
-          Contacts <span className="text-muted-foreground">({filteredContacts.length})</span>
+          تماس ها <span className="text-muted-foreground">({filteredContacts.length})</span>
         </h2>
       </div>
 
@@ -124,10 +124,10 @@ export default function PhoneBook() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Phone number</TableHead>
-              <TableHead>Job title & company</TableHead>
+              <TableHead>نام</TableHead>
+              <TableHead>محل کار</TableHead>
+              <TableHead>داخلی</TableHead>
+              <TableHead>مستقیم</TableHead>
               <TableHead className="w-[100px]"></TableHead>
             </TableRow>
           </TableHeader>
@@ -136,9 +136,6 @@ export default function PhoneBook() {
               <TableRow key={contact.id}>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Avatar className={`h-8 w-8 ${contact.color}`}>
-                      <AvatarFallback>{contact.initials}</AvatarFallback>
-                    </Avatar>
                     {contact.name}
                   </div>
                 </TableCell>
@@ -147,12 +144,6 @@ export default function PhoneBook() {
                 <TableCell>{contact.jobTitle ? `${contact.jobTitle}${contact.company ? ` at ${contact.company}` : ''}` : "-"}</TableCell>
                 <TableCell>
                   <div className="flex justify-end gap-2">
-                    <Button variant="ghost" size="icon">
-                      <Printer className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <Download className="h-4 w-4" />
-                    </Button>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon">
@@ -161,8 +152,8 @@ export default function PhoneBook() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                        <DropdownMenuItem>Delete</DropdownMenuItem>
+                        <DropdownMenuItem>ویرایش</DropdownMenuItem>
+                        <DropdownMenuItem>حذف</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
