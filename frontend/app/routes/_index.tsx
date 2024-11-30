@@ -1,5 +1,31 @@
-import { useState } from 'react'
-import { Search } from 'lucide-react'
+
+
+import * as React from "react"
+import {
+  ColumnDef,
+  ColumnFiltersState,
+  SortingState,
+  VisibilityState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table"
+import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
+
+import { Button } from "../components/ui/button"
+import { Checkbox } from "../components/ui/checkbox"
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../components/ui/dropdown-menu"
 import { Input } from "../components/ui/input"
 import {
   Table,
@@ -9,202 +35,229 @@ import {
   TableHeader,
   TableRow,
 } from "../components/ui/table"
-import { Avatar, AvatarFallback } from "../components/ui/avatar"
-import { Button } from "../components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../components/ui/dropdown-menu"
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "../components/ui/pagination"
-import { MoreHorizontal, Download, Printer } from 'lucide-react'
 
-interface Contact {
+const data: Contact[] = [
+  {
+    id: "m5gr84i9",
+    name:"sas",
+    int_phone:"123",
+    out_phone:"123",
+    ip_phone:"",
+    job:"sss"
+  },
+  {
+    id: "3u1reuv4",
+    name:"sas",
+    int_phone:"123",
+    out_phone:"123",
+    ip_phone:"",
+    job:"sss"
+  },
+  {
+    name:"sas",
+    id: "derv1ws0",
+    int_phone:"123",
+    out_phone:"123",
+    ip_phone:"",
+    job:"sss"
+  },
+  {
+    id: "5kma53ae",
+    name:"sas",
+    int_phone:"123",
+    out_phone:"123",
+    ip_phone:"",
+    job:"sss"
+  },
+  {
+    id: "bhqecj4p",
+    name:"sas",
+    int_phone:"123",
+    out_phone:"123",
+    ip_phone:"",
+    job:"sss"
+  },
+]
+
+export type Contact = {
   id: string
+  job: string
   name: string
-  email?: string
-  phone: string
-  jobTitle?: string
-  company?: string
-  initials: string
-  color: string
+  int_phone: string
+  out_phone?: string
+  ip_phone?: string
+  fax?: string
 }
 
-const contacts: Contact[] = [
+export const columns: ColumnDef<Contact>[] = [
   {
-    id: "1",
-    name: "123",
-    phone: "+989171572143",
-    initials: "1",
-    color: "bg-brown-500",
+    accessorKey: "name",
+    header: "نام",
+    cell: ({ row }) => (
+      <div >{row.getValue("name")}</div>
+    ),
   },
   {
-    id: "2",
-    name: "123",
-    phone: "+989171572143",
-    initials: "1",
-    color: "bg-cyan-500",
+    accessorKey: "job",
+    header: "محل کار"
   },
   {
-    id: "3",
-    name: "2r",
-    phone: "+989184368987",
-    initials: "2",
-    color: "bg-brown-500",
+    accessorKey: "int_phone",
+    header: "داخلی"
   },
   {
-    id: "4",
-    name: "Aa",
-    phone: "+992980049042",
-    initials: "A",
-    color: "bg-purple-500",
+    accessorKey: "out_phone",
+    header: "مستقیم"
   },
   {
-    id: "5",
-    name: "Aaab",
-    jobTitle: "Developer",
-    company: "Tech Co",
-    phone: "+989354930086",
-    initials: "A",
-    color: "bg-purple-500",
+    accessorKey: "ip_phone",
+    header: "IP Phone"
   },
-  // Add more contacts as needed
+  {
+    accessorKey: "fax",
+    header: "فکس"
+  },
+  {
+    id: "actions",
+    enableHiding: false,
+    cell: ({ row }) => {
+      const payment = row.original
+
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem>ویرایش</DropdownMenuItem>
+            <DropdownMenuItem>حذف</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )
+    },
+  },
 ]
 
 export default function PhoneBook() {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 3
-
-  const filteredContacts = contacts.filter(contact => 
-    contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (contact.jobTitle && contact.jobTitle.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (contact.company && contact.company.toLowerCase().includes(searchTerm.toLowerCase()))
+  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
   )
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({})
+  const [rowSelection, setRowSelection] = React.useState({})
+  const [globalFilter, setGlobalFilter] = React.useState("")
 
-  const pageCount = Math.ceil(filteredContacts.length / itemsPerPage)
-  const paginatedContacts = filteredContacts.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  )
+  const table = useReactTable({
+    data,
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    onGlobalFilterChange: setGlobalFilter,
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+      globalFilter,
+    },
+  })
 
   return (
-    <div className="p-6">
-      <div className="flex items-center space-x-2 mb-4">
-        <div className="relative flex-1">
-          <Search className="absolute right-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input 
-            placeholder="جستجوی نام یا عنوان شغلی ..." 
-            className="pr-8" 
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value)
-              setCurrentPage(1) // Reset to first page on new search
-            }}
-          />
-        </div>
-      </div>
+    <div className="w-full">
+      <div className="flex items-center py-4 mx-5">
+        <Input
+          placeholder="جستجوی نام یا محل کار ..."
+          value={globalFilter ?? ''}
+          onChange={value => setGlobalFilter(String(value.target.value))}
+          className="max-w-full py-6"
+        />
 
-      <div className="mb-4">
-        <h2 className="text-xl font-semibold">
-          تماس ها <span className="text-muted-foreground">({filteredContacts.length})</span>
-        </h2>
       </div>
-
       <div className="rounded-md border">
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>نام</TableHead>
-              <TableHead>محل کار</TableHead>
-              <TableHead>داخلی</TableHead>
-              <TableHead>مستقیم</TableHead>
-              <TableHead className="w-[100px]"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedContacts.map((contact) => (
-              <TableRow key={contact.id}>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    {contact.name}
-                  </div>
-                </TableCell>
-                <TableCell>{contact.email || "-"}</TableCell>
-                <TableCell>{contact.phone}</TableCell>
-                <TableCell>{contact.jobTitle ? `${contact.jobTitle}${contact.company ? ` at ${contact.company}` : ''}` : "-"}</TableCell>
-                <TableCell>
-                  <div className="flex justify-end gap-2">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Open menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>ویرایش</DropdownMenuItem>
-                        <DropdownMenuItem>حذف</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </TableCell>
+          <TableHeader >
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow  key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead className="text-center" key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  )
+                })}
               </TableRow>
             ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                className="text-center"
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  چیزی یافت نشد
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
-
-      <div className="mt-4">
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious 
-                href="#" 
-                onClick={(e) => {
-                  e.preventDefault()
-                  setCurrentPage(prev => Math.max(prev - 1, 1))
-                }}
-                className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
-              />
-            </PaginationItem>
-            {[...Array(pageCount)].map((_, i) => (
-              <PaginationItem key={i}>
-                <PaginationLink 
-                  href="#" 
-                  onClick={(e) => {
-                    e.preventDefault()
-                    setCurrentPage(i + 1)
-                  }}
-                  isActive={currentPage === i + 1}
-                >
-                  {i + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-            <PaginationItem>
-              <PaginationNext 
-                href="#" 
-                onClick={(e) => {
-                  e.preventDefault()
-                  setCurrentPage(prev => Math.min(prev + 1, pageCount))
-                }}
-                className={currentPage === pageCount ? 'pointer-events-none opacity-50' : ''}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <div className="flex-1 text-sm text-muted-foreground">
+          {table.getFilteredSelectedRowModel().rows.length} از{" "}
+          {table.getFilteredRowModel().rows.length} ردیف.
+        </div>
+        <div className="space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            قبل
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            بعد
+          </Button>
+        </div>
       </div>
     </div>
   )
 }
-

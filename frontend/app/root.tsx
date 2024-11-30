@@ -7,10 +7,11 @@ import {
 } from "@remix-run/react";
 import type { LinksFunction } from "@remix-run/node";
 
-import "./tailwind.css";
-import { DirectionProvider } from "@radix-ui/react-direction";
+// import "./tailwind.css";
+import tailwindCSS from "./tailwind.css?url";
 
 export const links: LinksFunction = () => [
+  { rel: "stylesheet", href: tailwindCSS },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",
@@ -33,10 +34,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <DirectionProvider dir="rtl">
 
           {children}
-        </DirectionProvider>
 
         <ScrollRestoration />
         <Scripts />
