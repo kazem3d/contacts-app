@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'phonebook',
     'rest_framework',
+    'import_export',
 ]
 
 MIDDLEWARE = [
