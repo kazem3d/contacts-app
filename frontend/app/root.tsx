@@ -5,7 +5,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
-import type { LinksFunction } from "@remix-run/node";
+import type { LinksFunction, MetaFunction } from "@remix-run/node";
 
 // import "./tailwind.css";
 import tailwindCSS from "./tailwind.css?url";
@@ -23,6 +23,9 @@ export const links: LinksFunction = () => [
     href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
 ];
+
+
+
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -49,3 +52,10 @@ export default function App() {
     <Outlet />
   )
 }
+
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "دفتر تلفن" },
+  ];
+};
