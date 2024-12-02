@@ -1,0 +1,28 @@
+{
+    # Global options
+    admin off
+
+}
+
+:80 {
+ 
+    handle /static/* {
+        uri strip_prefix /static
+        root * /app/staticfiles
+        file_server 
+    }
+
+ 
+
+    handle {
+        reverse_proxy contacts-app-remix-app:3000
+    }
+
+    handle /api/*  {
+        reverse_proxy contacts-app:8000
+    }
+
+    handle /admin/*  {
+        reverse_proxy contacts-app:8000
+    } 
+}

@@ -1,0 +1,55 @@
+version: '3.8'
+services:
+  contacts-app:
+    build:
+      context : ./backend
+      dockerfile : Dockerfile
+    container_name : contacts-app
+    # env_file: ./.env/prod.env
+    command: bash -c "python manage.py collectstatic --noinput && gunicorn --bind :8000 -w=2 config.wsgi:application"
+    restart : always
+    # ports:
+    #   - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - contacts_app_static_volume:/app/staticfiles
+    networks:
+      - contacts_app_network
+
+  caddy:
+    image: caddy:2.8.4-alpine
+    container_name: contacts-app-caddy
+    ports:
+      - "80:80"
+    restart : always
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - contacts_app_static_volume:/app/staticfiles
+    depends_on:
+      - contacts-app
+    networks:
+      - contacts_app_network
+
+  contacts-app-remix-app:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name : contacts-app-remix-app
+    command: ["npm", "run", "start"]
+    # ports:
+    #   - "3000:3000"
+    environment:
+      NODE_ENV: production
+    volumes:
+      - ./frontend:/app
+    restart : always
+    networks:
+      - contacts_app_network
+
+networks:
+  contacts_app_network:
+    external : true
+
+volumes:
+  contacts_app_static_volume:
+    external : true

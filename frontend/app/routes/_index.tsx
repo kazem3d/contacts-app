@@ -119,11 +119,11 @@ export default function PhoneBook() {
 
   return (
     <div className="w-3/5 mx-auto mt-12">
-
+      <h1 className="text-lg font-bold tracking-tight leading-9 mb-4"> دفتر تلفن </h1>
       <div className="rounded-md border">
         <DataTable columns={columns} data={contacts} hasGlobalSearch hasPaginate />
       </div>
-      <p className="text-xs text-slate-500 m-4">جهت هرگونه تغییرات و حذف اضافه با قسمت اطلاعات تماس بگیرید</p>
+      <p className="text-xs text-slate-500 m-4">جهت هرگونه تغییرات و حذف اضافه با قسمت اطلاعات (داخلی 2222) تماس بگیرید</p>
 
     </div>
   )
